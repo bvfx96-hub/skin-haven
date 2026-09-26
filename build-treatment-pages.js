@@ -4,18 +4,22 @@ const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quo
 let home = fs.readFileSync('index.html','utf8');
 const header = home.match(/<header class="header">[\s\S]*?<\/header>/)[0].replace(/href="#([^" ]+)"/g,'href="/index.html#$1"').replace(/src="assets\//g,'src="/assets/').replace('class="active"','');
 const notice = home.match(/<dialog class="page-notice"[\s\S]*?<\/dialog>/)[0];
-const base = fs.readFileSync('acne-acne-scar-treatment-durg-bhilai/index.html','utf8');
-const visit = base.match(/<section class="visit-clinic"[\s\S]*?<\/section>/)[0];
+const basePath = 'acne-acne-scar-treatment-durg-bhilai/index.html';
+const base = fs.existsSync(basePath) ? fs.readFileSync(basePath,'utf8') : home;
+const visitMatch = base.match(/<section class="visit-clinic"[\s\S]*?<\/section>/);
+const visit = visitMatch ? visitMatch[0] : '<section class="visit-clinic" id="visit-clinic"><h2>Visit Skin Haven Clinic</h2><p>Book a consultation with Skin Haven in Durg for personalised skin and hair care.</p></section>';
 data.forEach(d => {
   const image = `assets/treatments/${d.slug}.jpg`;
   if (fs.existsSync(`assets/treatments/${d.image}`)) fs.copyFileSync(`assets/treatments/${d.image}`,image);
   const pagePath = `${d.slug}/index.html`;
   let article = `<p class="treatment-intro">${esc(d.intro)}</p>` + d.sections.map(([title,body],i) => `<h2 id="topic-${i}">${esc(title)}</h2>${Array.isArray(body)?`<ul>${body.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:`<p>${esc(body)}</p>`}`).join('');
-  const preserve = ['dark-circle-treatment-durg-bhilai','pigmentation-dark-spots-treatment-durg-bhilai','hair-loss-alopecia-treatment-durg-bhilai'].includes(d.slug);
+  const preserve = ['dark-circle-treatment-durg-bhilai','pigmentation-dark-spots-treatment-durg-bhilai','hair-loss-alopecia-treatment-durg-bhilai'].includes(d.slug) && fs.existsSync(pagePath);
   if (preserve) {
     const old = fs.readFileSync(pagePath,'utf8');
-    article = old.match(/<article class="treatment-article">([\s\S]*?)<section class="visit-clinic"/)[1];
-  } else {
+    const preserved = old.match(/<article class="treatment-article">([\s\S]*?)<section class="visit-clinic"/);
+    if (preserved) article = preserved[1];
+  }
+  if (!preserve) {
     article += `<h2 id="treatment-faqs">Frequently asked questions</h2>${d.faq.map(([q,a])=>`<details class="treatment-faq"><summary>${esc(q)}</summary><div><p>${esc(a)}</p></div></details>`).join('')}`;
   }
   article += `<h2 id="planning-visit">Plan your visit from Bhilai or across Chhattisgarh</h2><p>Skin Haven is located near the new bus stand in Durg, at Arihant medical store, Sobhagya Complex, Chhattisgarh 491001. Patients from Bhilai, Risali, Supela, Nehru Nagar, Smriti Nagar and other parts of Chhattisgarh can call before travelling to confirm appointment availability.</p><p>Procedure suitability and pricing are discussed after assessment. Contact the clinic for an individual estimate and follow-up planning; a phone enquiry does not confirm a procedure booking.</p>`;
@@ -27,8 +31,9 @@ data.forEach(d => {
   fs.mkdirSync(d.slug,{recursive:true}); fs.writeFileSync(pagePath,output);
 });
 let index=0;
-home = home.replace(/<article class="treatment-tile"[\s\S]*?<\/article>/g,()=>{
+home = home.replace(/<article class="treatment-tile"[\s\S]*?<\/article>/g,(match)=>{
   const d=data[index++];
+  if (!d) return match;
   return `<article class="treatment-tile"><div class="treatment-image treatment-photo"><img src="assets/treatments/${d.slug}.jpg" alt="${esc(d.name)} illustrative photograph" loading="lazy" width="700" height="500"></div><div class="treatment-tile-content"><h3>${esc(d.name)}</h3><a href="/${d.slug}" aria-label="Know more about ${esc(d.name)}">Know More <span aria-hidden="true">↗</span></a></div></article>`;
 });
 home = home.replace(/<p class="treatments-note">[\s\S]*?<\/p>/,'<p class="treatments-note">Images are illustrative, not patient results. Every treatment starts with a clinical consultation.</p>');
