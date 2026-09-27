@@ -1,0 +1,6 @@
+const fs=require('fs');
+const photos=['pimple','dark-circle','pigmentation-dark-spots','botox','skin-lightening','hair-loss-alopecia','dermal-fillers','acne-scar'].map(x=>`assets/treatments/${x}-treatment-durg-bhilai.jpg`);
+let i=0,h=fs.readFileSync('index.html','utf8');
+h=h.replace(/(<article class="condition-card"[^>]*>)([\s\S]*?)(<a class="condition-more"[\s\S]*?<\/a>)(<\/article>)/g,(_,start,body,link,end)=>{const title=body.match(/<h3>(.*?)<\/h3>/)[1];return `${start}<div class="condition-flip" role="button" tabindex="0" aria-label="Show illustrative photo: ${title}" aria-pressed="false"><div class="condition-flip-inner"><div class="condition-front">${body}<span class="condition-flip-hint">Tap to see photo ↻</span></div><div class="condition-back" aria-hidden="true"><img src="${photos[i++]}" alt="" loading="lazy"><span>${title}<small>Illustrative image · Tap to return</small></span></div></div></div>${link}${end}`;});fs.writeFileSync('index.html',h);
+const paths=['index.html','about-us.html','contact.html',...fs.readdirSync('.',{withFileTypes:true}).filter(e=>e.isDirectory()&&e.name.endsWith('-durg-bhilai')).map(e=>e.name+'/index.html'),'apply-site-details.js'];
+for(const p of paths){let s=fs.readFileSync(p,'utf8');s=s.replaceAll('Skin Haven. All rights reserved.','Skin Haven. Development &amp; Promotion by BVFX Digify.');fs.writeFileSync(p,s);}

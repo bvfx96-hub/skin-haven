@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "builds": [
+    { "src": "server.js", "use": "@vercel/node", "config": { "includeFiles": ["*.html", "*-durg-bhilai/index.html"] } },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*-durg-bhilai/index.html", "use": "@vercel/static" },
+    { "src": "*.css", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" },
+    { "src": "{about,admin,booking,card-scroll,conditions,language-switch,results,script,site-content,video-gallery}.js", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/server.js" }
+  ]
+}

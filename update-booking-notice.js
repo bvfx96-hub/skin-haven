@@ -1,0 +1,20 @@
+const fs=require('fs');let s=fs.readFileSync('booking.js','utf8');const start=s.indexOf('const localToday');const end=s.indexOf('visitForm.elements.phone');s=s.slice(0,start)+`const visitTime = visitForm.elements.time;
+const bookingLeadTime = 24 * 60 * 60 * 1000;
+const clinicParts = timestamp => new Date(timestamp + 330 * 60000).toISOString();
+const validateVisitDay = () => {
+  const earliest = Date.now() + bookingLeadTime;
+  const earliestParts = clinicParts(earliest);
+  visitDate.min = earliestParts.slice(0,10);
+  const sunday = visitDate.value && new Date(visitDate.value+'T12:00:00+05:30').getUTCDay() === 0;
+  visitDate.setCustomValidity(sunday ? 'The clinic is closed on Sunday. Please choose Monday to Saturday.' : '');
+  const selected = visitDate.value && visitTime.value ? Date.parse(visitDate.value+'T'+visitTime.value+':00+05:30') : NaN;
+  visitTime.setCustomValidity(Number.isFinite(selected) && selected < earliest ? 'Please choose an appointment at least 24 hours from now (India time).' : '');
+  const rounded = clinicParts(Math.ceil(earliest / 60000) * 60000);
+  visitTime.min = visitDate.value === rounded.slice(0,10) ? rounded.slice(11,16) : '';
+  document.querySelector('#visit-day').textContent = sunday ? 'Sunday closed — choose another date' : visitDate.value ? new Date(visitDate.value+'T12:00:00+05:30').toLocaleDateString('en-IN',{weekday:'long',timeZone:'Asia/Kolkata'}) : 'Monday–Saturday · Sunday closed';
+};
+visitDate.addEventListener('input', validateVisitDay);
+visitTime.addEventListener('input', validateVisitDay);
+validateVisitDay();
+`+s.slice(end);s=s.replace('  visitDate.min = localToday();\n','');s=s.replace('`Preferred time: ${fields.get(\'time\')}`','`Preferred time (IST): ${fields.get(\'time\')}`');s=s.replace("'Please confirm availability for my preferred date and time.'","'Booking requires at least 24 hours advance notice.', 'Please arrive at the clinic 30 minutes before your confirmed appointment time.', 'Please confirm availability for my preferred date and time.'");s=s.replace("document.querySelector('.visit-request-status').replaceChildren(link);","const reminder = document.createElement('p');\n  reminder.textContent = 'Request prepared. Once the clinic confirms your appointment, please arrive 30 minutes before your appointment time.';\n  document.querySelector('.visit-request-status').replaceChildren(reminder, link);\n  link.addEventListener('click', event => { validateVisitDay(); if (!visitForm.reportValidity()) { event.preventDefault(); document.querySelector('.visit-request-status').replaceChildren(); } });");fs.writeFileSync('booking.js',s);
+let h=fs.readFileSync('index.html','utf8');h=h.replace('Subject to clinic confirmation','India time (IST) · Clinic confirms');h=h.replace('<label for="visit-message">','<p class="visit-policy">Book at least <strong>24 hours in advance</strong>. Please arrive <strong>30 minutes before</strong> your confirmed appointment time.</p><label for="visit-message">');fs.writeFileSync('index.html',h);
