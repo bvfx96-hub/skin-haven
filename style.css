@@ -91,3 +91,17 @@
 .care-method-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.care-method-card{min-width:0;padding:28px;border:1px solid rgba(224,244,232,.18);border-radius:27px;background:rgba(26,48,47,.78);backdrop-filter:blur(15px);box-shadow:0 18px 40px #071b1b24}.care-method-number{font-size:44px;font-weight:700;color:#a6b9b4;line-height:1}.care-method-card h3{font:400 28px Georgia,serif;color:#d4eddf;margin:17px 0 21px}.care-method-card img{display:block;width:100%;height:210px;object-fit:cover;border-radius:17px}.care-method-card:first-child img{object-position:center 48%}.care-method-card p{font-size:14px;line-height:1.9;color:#e1e9e5;margin:20px 0 0}.care-method-cta{display:inline-flex;align-items:center;gap:35px;border-bottom:1px solid #8bb2a5;padding:14px 0 8px;margin-top:22px;font-size:14px;color:#fffaf3}.care-method-cta:hover{color:#d4eddf}
 @media(max-width:800px){.care-method{padding:48px 22px}.care-method-grid{gap:14px}.care-method-card{padding:19px}.care-method-card img{height:160px}.care-method-card h3{font-size:24px}}
 @media(max-width:600px){.care-method{padding:42px 20px}.care-method-heading{margin-bottom:27px}.care-method-heading h2{font-size:33px}.care-method-heading>p{font-size:14px;line-height:1.75}.care-method-grid{grid-template-columns:1fr;gap:16px}.care-method-card{padding:22px;border-radius:22px}.care-method-number{font-size:35px}.care-method-card h3{margin:10px 0 16px}.care-method-card img{height:190px}.care-method-card p{margin-top:16px}.care-method:after{background:rgba(16,41,41,.88)}}
+
+.care-method-dots{display:none}
+@media(max-width:600px){
+.care-method-grid{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:4px}
+.care-method-grid::-webkit-scrollbar{display:none}
+.care-method-grid .care-method-card{flex:0 0 92%;scroll-snap-align:start;scroll-snap-stop:always}
+.care-method-grid .care-method-card:last-child{margin-right:8%}
+.care-method-dots{display:flex;justify-content:center;gap:3px;margin-top:12px}
+.care-method-dots button{width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;padding:0;border-radius:50%}
+.care-method-dots button:before{content:"";width:8px;height:8px;border-radius:20px;background:#8ca5a0;transition:width .2s,background .2s}
+.care-method-dots button[aria-pressed="true"]:before{width:24px;background:#d4eddf}
+.care-method-dots button:focus-visible{outline:2px solid #fffaf3}
+}
+@media(prefers-reduced-motion:reduce){.care-method-dots button:before{transition:none}}
